@@ -1,4 +1,4 @@
-![logo](/Users/lintsinghua/XCodeReviewer/public/images/logo.png)
+![logo](/logo.png)
 
 项目地址：[GitHub - lintsinghua/XCodeReviewer ——  “人人可用的AI代码审计工具，支持Github\GitLab\本地仓库集成，支持即时代码分析，一键审计并生成专业报告！”](https://github.com/lintsinghua/XCodeReviewer)
 
@@ -8,7 +8,7 @@
 
 > 大家可以查看下面系统以"即时代码分析"为例，生成的审计报告部分截图
 
-![example2](/Users/lintsinghua/XCodeReviewer/public/images/example2.png)
+![example2](/example2.png)
 
 ## ✨项目亮点
 
@@ -27,15 +27,15 @@
 ## 🚀 运行截图
 
 *实时展示项目统计、质量趋势和系统性能，提供全面的代码审计概览*
-![example1](/Users/lintsinghua/XCodeReviewer/public/images/example1.png)
+![example1](/example1.png)
 
 *支持代码片段快速分析，提供详细的 What-Why-How 解释和修复建议*
 
-![example2](/Users/lintsinghua/XCodeReviewer/public/images/example2.png)
+![example2](/example2.png)
 
 *集成 GitHub/GitLab 仓库，支持多语言项目审计和批量代码分析*
 
-![example3](/Users/lintsinghua/XCodeReviewer/public/images/example3.png)
+![example3](/example3.png)
 
 **PS**
 · 项目初期，时间较紧，正在不断完善和持续开发中，主要核心功能已实现。部分功能（用户管理、系统管理等）仅保留接口，待后续开发～
