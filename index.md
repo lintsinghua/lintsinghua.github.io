@@ -59,3 +59,5 @@
 > 欢迎佬们随时提出批评和建议！感谢感谢！！
 
 项目地址：[GitHub - lintsinghua/XCodeReviewer ——  “人人可用的AI代码审计工具，支持Github\GitLab\本地仓库集成，支持即时代码分析，一键审计并生成专业报告！”](https://github.com/lintsinghua/XCodeReviewer)
+
+[![Star History](https://api.star-history.com/svg?repos=lintsinghua/XCodeReviewer&type=Date)](https://star-history.com/#lintsinghua/XCodeReviewer&Date)
