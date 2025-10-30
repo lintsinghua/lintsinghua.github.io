@@ -20,8 +20,10 @@
                 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             line-height: 1.7;
             color: #1a1a1a;
-            background: #0a0a0a;
+            background: #000000;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
@@ -30,8 +32,9 @@
         }
 
         header {
-            background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
-            border-bottom: 4px solid #8B0000;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 50%, #000000 100%);
+            border-bottom: 3px solid #8B0000;
+            box-shadow: 0 4px 20px rgba(139, 0, 0, 0.3);
             text-align: center;
             padding: 100px 40px 80px;
             color: white;
@@ -47,10 +50,8 @@
             right: 0;
             bottom: 0;
             background:
-                linear-gradient(45deg, transparent 48%, rgba(139, 0, 0, 0.03) 49%, rgba(139, 0, 0, 0.03) 51%, transparent 52%),
-                linear-gradient(-45deg, transparent 48%, rgba(139, 0, 0, 0.03) 49%, rgba(139, 0, 0, 0.03) 51%, transparent 52%);
-            background-size: 60px 60px;
-            opacity: 0.5;
+                radial-gradient(circle at 20% 50%, rgba(139, 0, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(139, 0, 0, 0.15) 0%, transparent 50%);
             pointer-events: none;
         }
 
@@ -82,11 +83,34 @@
         .subtitle {
             font-size: 1.5em;
             color: #e0e0e0;
-            margin-bottom: 40px;
+            margin-bottom: 15px;
             font-weight: 300;
             letter-spacing: 0.5px;
             position: relative;
             z-index: 1;
+        }
+
+        .author {
+            font-size: 1.8em;
+            color: #8B0000;
+            margin-bottom: 40px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            position: relative;
+            z-index: 1;
+            text-transform: uppercase;
+            text-shadow: 0 4px 12px rgba(139, 0, 0, 0.6);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 4px 12px rgba(139, 0, 0, 0.6), 0 0 20px rgba(139, 0, 0, 0.4);
+            }
+
+            to {
+                text-shadow: 0 4px 12px rgba(139, 0, 0, 0.8), 0 0 30px rgba(139, 0, 0, 0.6), 0 0 40px rgba(139, 0, 0, 0.4);
+            }
         }
 
         .badges {
@@ -174,8 +198,9 @@
 
         .section {
             padding: 90px 60px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e5e5e5;
             position: relative;
+            transition: background 0.3s ease;
         }
 
         .section::after {
@@ -184,14 +209,14 @@
             bottom: 0;
             left: 50%;
             width: 0;
-            height: 1px;
+            height: 2px;
             background: linear-gradient(90deg, transparent, #8B0000, transparent);
             transform: translateX(-50%);
             transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .section:hover::after {
-            width: 80%;
+            width: 60%;
         }
 
         .section:last-child {
@@ -199,12 +224,13 @@
         }
 
         .section-dark {
-            background: #1a1a1a;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
             color: white;
+            border-bottom-color: #2a2a2a;
         }
 
         .section-accent {
-            background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+            background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%);
         }
 
         h2 {
@@ -253,31 +279,42 @@
         .architecture-diagram {
             max-width: 1000px;
             margin: 60px auto 0;
-            padding: 40px;
-            background: white;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            padding: 50px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+            border: 2px solid #e5e5e5;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .architecture-diagram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8B0000, #a00000, #8B0000);
         }
 
         .architecture-diagram:hover {
-            box-shadow: 0 16px 48px rgba(139, 0, 0, 0.12);
-            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(139, 0, 0, 0.15);
+            transform: translateY(-6px);
+            border-color: #8B0000;
         }
 
         .architecture-diagram img {
             width: 100%;
             height: auto;
             display: block;
-            border: 2px solid #f0f0f0;
         }
 
         .diagram-caption {
-            margin-top: 20px;
+            margin-top: 25px;
             text-align: center;
-            font-size: 1em;
-            color: #666;
-            font-weight: 500;
+            font-size: 1.05em;
+            color: #555;
+            font-weight: 600;
             letter-spacing: 0.5px;
         }
 
@@ -514,6 +551,7 @@
             line-height: 1.8;
             border: 1px solid #2a2a2a;
             white-space: pre;
+            text-align: left;
         }
 
         .info-box {
@@ -538,12 +576,13 @@
         }
 
         .contact-item {
-            padding: 40px 35px;
-            background: #1a1a1a;
+            padding: 45px 40px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
             text-align: center;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            border: 1px solid #333;
         }
 
         .contact-item::before {
@@ -553,13 +592,15 @@
             left: 0;
             right: 0;
             height: 0;
-            background: linear-gradient(180deg, #8B0000, transparent);
+            background: linear-gradient(90deg, #8B0000, #a00000);
             transition: height 0.4s ease;
         }
 
         .contact-item:hover {
-            background: #252525;
-            transform: translateY(-6px);
+            background: linear-gradient(135deg, #333 0%, #252525 100%);
+            transform: translateY(-8px);
+            border-color: #8B0000;
+            box-shadow: 0 12px 40px rgba(139, 0, 0, 0.3);
         }
 
         .contact-item:hover::before {
@@ -567,37 +608,55 @@
         }
 
         .contact-label {
-            font-size: 0.85em;
-            color: #888;
-            margin-bottom: 12px;
+            font-size: 0.75em;
+            color: #999;
+            margin-bottom: 15px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 600;
+            letter-spacing: 3px;
+            font-weight: 700;
         }
 
         .contact-value {
-            font-size: 1.1em;
-            color: white;
+            font-size: 1.15em;
+            color: #ffffff;
+            font-weight: 500;
         }
 
         .contact-value a {
-            color: #8B0000;
+            color: #ff6b6b;
             text-decoration: none;
             border-bottom: 2px solid transparent;
             transition: all 0.3s ease;
-            padding-bottom: 2px;
+            padding-bottom: 3px;
+            font-weight: 600;
         }
 
         .contact-value a:hover {
-            border-bottom-color: #8B0000;
-            color: #a00000;
+            border-bottom-color: #ff6b6b;
+            color: #ff8787;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
         }
 
         .cta-section {
             text-align: center;
-            padding: 100px 60px;
-            background: #1a1a1a;
+            padding: 120px 60px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 50%, #000000 100%);
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 30% 50%, rgba(139, 0, 0, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(139, 0, 0, 0.2) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .cta-section h2 {
@@ -605,30 +664,44 @@
             border: none;
             padding: 0;
             margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
         }
 
         .cta-section p {
-            font-size: 1.2em;
-            color: #cccccc;
-            margin-bottom: 40px;
+            font-size: 1.3em;
+            color: #e0e0e0;
+            margin-bottom: 50px;
+            position: relative;
+            z-index: 1;
         }
 
         footer {
             text-align: center;
             padding: 50px 40px;
-            background: #0a0a0a;
-            color: #888;
-            border-top: 1px solid #2a2a2a;
+            background: #000000;
+            color: #999;
+            border-top: 3px solid #8B0000;
+            box-shadow: 0 -4px 20px rgba(139, 0, 0, 0.3);
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1em;
+            line-height: 1.8;
         }
 
         footer a {
-            color: #8B0000;
+            color: #ff6b6b;
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid transparent;
+            font-weight: 600;
         }
 
         footer a:hover {
-            color: #a00000;
+            color: #ff8787;
+            border-bottom-color: #ff8787;
         }
 
         @media (max-width: 1024px) {
@@ -646,46 +719,174 @@
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5em;
+            header {
+                padding: 60px 20px 50px;
             }
 
-            h2 {
-                font-size: 2em;
+            .logo {
+                width: 120px;
+                height: 120px;
+                margin-bottom: 30px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+                letter-spacing: -1px;
             }
 
             .subtitle {
-                font-size: 1.2em;
+                font-size: 1.1em;
+                margin-bottom: 12px;
+            }
+
+            .author {
+                font-size: 1.3em;
+                letter-spacing: 2px;
+                margin-bottom: 30px;
+            }
+
+            .badges {
+                gap: 8px;
+            }
+
+            .badges img {
+                height: 18px;
+            }
+
+            h2 {
+                font-size: 1.8em;
+                padding-left: 16px;
+                border-left-width: 4px;
             }
 
             .section {
-                padding: 50px 30px;
+                padding: 50px 20px;
+            }
+
+            .section-intro {
+                font-size: 1em;
+                margin-bottom: 30px;
             }
 
             .architecture-diagram {
-                padding: 20px;
-                margin: 40px auto 0;
+                padding: 15px;
+                margin: 30px auto 0;
             }
 
             .features {
                 grid-template-columns: 1fr;
+                gap: 1px;
+            }
+
+            .feature-card {
+                padding: 25px 20px;
+            }
+
+            .feature-title {
+                font-size: 1.2em;
+            }
+
+            .feature-desc {
+                font-size: 0.92em;
+            }
+
+            .screenshots {
+                grid-template-columns: 1fr;
+            }
+
+            .screenshot-caption {
+                font-size: 0.9em;
+                padding: 12px 15px;
             }
 
             .tech-stack {
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .tech-badge {
+                padding: 18px 15px;
+                font-size: 0.85em;
+            }
+
             .llm-platforms {
                 grid-template-columns: 1fr;
+            }
+
+            .llm-badge {
+                padding: 20px 15px;
+                font-size: 0.9em;
+            }
+
+            .quick-start {
+                padding: 25px 20px;
+            }
+
+            h3 {
+                font-size: 1.3em;
+                margin: 30px 0 15px;
+            }
+
+            .code-block {
+                padding: 20px 15px;
+                font-size: 0.8em;
+                line-height: 1.5;
+                overflow-x: auto;
+                white-space: pre;
+                word-wrap: normal;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .info-box {
+                padding: 20px;
+                font-size: 0.95em;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-item {
+                padding: 30px 20px;
+            }
+
+            .contact-label {
+                font-size: 0.8em;
+            }
+
+            .contact-value {
+                font-size: 1em;
+            }
+
+            .cta-section {
+                padding: 60px 30px;
+            }
+
+            .cta-section h2 {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+
+            .cta-section p {
+                font-size: 1.1em;
+                margin-bottom: 30px;
             }
 
             .cta-buttons {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 15px;
             }
 
             .btn {
                 width: 100%;
+                padding: 16px 40px;
+                font-size: 0.95em;
+                letter-spacing: 1px;
+            }
+
+            footer {
+                padding: 40px 20px;
+                font-size: 0.9em;
             }
         }
     </style>
@@ -700,6 +901,7 @@
             </div>
             <h1>XCodeReviewer</h1>
             <p class="subtitle">AI-Powered Intelligent Code Audit Platform</p>
+            <p class="author">Created by lintsinghua</p>
 
             <div class="badges">
                 <img src="https://img.shields.io/badge/version-1.2.0-8B0000.svg" alt="Version">
@@ -846,36 +1048,6 @@
                 </div>
             </section>
 
-            <section class="section section-dark">
-                <h2>联系方式</h2>
-                <div class="contact-grid">
-                    <div class="contact-item">
-                        <div class="contact-label">项目地址</div>
-                        <div class="contact-value">
-                            <a href="https://github.com/lintsinghua/XCodeReviewer" target="_blank">
-                                github.com/lintsinghua/XCodeReviewer
-                            </a>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-label">问题反馈</div>
-                        <div class="contact-value">
-                            <a href="https://github.com/lintsinghua/XCodeReviewer/issues" target="_blank">
-                                GitHub Issues
-                            </a>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-label">作者邮箱</div>
-                        <div class="contact-value">
-                            <a href="mailto:lintsinghua@qq.com">
-                                lintsinghua@qq.com
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <section class="section">
                 <h2>快速开始</h2>
                 <div class="quick-start">
@@ -948,11 +1120,41 @@
                     STAR ON GITHUB
                 </a>
             </div>
+
+            <section class="section section-dark">
+                <h2>联系方式</h2>
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <div class="contact-label">项目地址</div>
+                        <div class="contact-value">
+                            <a href="https://github.com/lintsinghua/XCodeReviewer" target="_blank">
+                                github.com/lintsinghua/XCodeReviewer
+                            </a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">问题反馈</div>
+                        <div class="contact-value">
+                            <a href="https://github.com/lintsinghua/XCodeReviewer/issues" target="_blank">
+                                GitHub Issues
+                            </a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">作者邮箱</div>
+                        <div class="contact-value">
+                            <a href="mailto:lintsinghua@qq.com">
+                                lintsinghua@qq.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <footer>
             <p>
-                © 2024 XCodeReviewer |
+                © 2025 XCodeReviewer |
                 <a href="https://github.com/lintsinghua/XCodeReviewer/blob/main/LICENSE" target="_blank">MIT License</a>
                 |
                 Made by <a href="https://github.com/lintsinghua" target="_blank">lintsinghua</a>
