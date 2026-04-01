@@ -6,7 +6,7 @@
 <title>解码 Agent Harness — Claude Code 架构深度剖析</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-theme">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
@@ -221,15 +221,17 @@ body{
 .markdown-body tr:hover td{background:var(--accent-light)}
 .markdown-body code{
   font-family:var(--font-mono);font-size:.84em;padding:2px 7px;
-  border-radius:4px;background:var(--bg-code);color:#e2e8f0;
+  border-radius:4px;background:var(--bg-sidebar);color:var(--text);
 }
 .markdown-body pre{
-  margin:20px 0;border-radius:var(--radius);background:var(--bg-code);
+  margin:20px 0;border-radius:var(--radius);
   overflow-x:auto;border:1px solid var(--border);
+  background:#f6f8fa;
 }
+[data-theme="dark"] .markdown-body pre{background:#0d1117}
 .markdown-body pre code{
-  display:block;padding:20px 24px;background:transparent;color:inherit;
-  font-size:.82rem;line-height:1.7;white-space:pre;
+  display:block;padding:20px 24px;background:transparent;
+  font-size:.82rem;line-height:1.7;white-space:pre;color:inherit;
 }
 
 /* ─── TOC ─── */
