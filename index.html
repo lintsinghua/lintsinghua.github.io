@@ -233,6 +233,11 @@ body{
   display:block;padding:20px 24px;background:transparent;
   font-size:.82rem;line-height:1.7;white-space:pre;color:inherit;
 }
+.mermaid-wrap{
+  margin:20px 0;text-align:center;border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;background:var(--bg-card);overflow-x:auto;
+}
+.mermaid-wrap svg{max-width:100%;height:auto}
 
 /* ─── TOC ─── */
 .toc{
@@ -337,6 +342,7 @@ body{
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
 const BASE='https://raw.githubusercontent.com/lintsinghua/claude-code-book/main/';
 
@@ -368,11 +374,13 @@ let currentChapter=null;
 
 marked.setOptions({
   highlight:(code,lang)=>{
+    if(lang==='mermaid')return code;
     if(lang&&hljs.getLanguage(lang))return hljs.highlight(code,{language:lang}).value;
     return hljs.highlightAuto(code).value;
   },
   breaks:false,gfm:true,
 });
+mermaid.initialize({startOnLoad:false,theme:'default',securityLevel:'loose'});
 
 function buildNav(){
   const nav=document.getElementById('nav');
@@ -438,6 +446,23 @@ async function loadChapter(id){
   document.title=`${ch.title} — 解码 Agent Harness`;
   buildTOC();
   updateProgress();
+  renderMermaid();
+}
+
+async function renderMermaid(){
+  const blocks=document.querySelectorAll('.markdown-body pre code.language-mermaid');
+  if(!blocks.length)return;
+  for(let i=0;i<blocks.length;i++){
+    const code=blocks[i].textContent;
+    const pre=blocks[i].parentElement;
+    try{
+      const {svg}=await mermaid.render('mermaid-'+Date.now()+'-'+i,code);
+      const wrap=document.createElement('div');
+      wrap.className='mermaid-wrap';
+      wrap.innerHTML=svg;
+      pre.replaceWith(wrap);
+    }catch(e){console.warn('Mermaid:',e)}
+  }
 }
 
 function buildTOC(){
