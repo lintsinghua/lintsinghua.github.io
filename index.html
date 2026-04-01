@@ -387,6 +387,7 @@ marked.setOptions({
   breaks:false,gfm:true,
 });
 mermaid.initialize({startOnLoad:false,theme:'default',securityLevel:'loose'});
+function getMermaidTheme(){return document.documentElement.getAttribute('data-theme')==='dark'?'dark':'default'}
 
 function buildNav(){
   const nav=document.getElementById('nav');
@@ -458,6 +459,7 @@ async function loadChapter(id){
 async function renderMermaid(){
   const blocks=document.querySelectorAll('.markdown-body pre code.language-mermaid');
   if(!blocks.length)return;
+  mermaid.initialize({startOnLoad:false,theme:getMermaidTheme(),securityLevel:'loose'});
   for(let i=0;i<blocks.length;i++){
     const code=blocks[i].textContent;
     const pre=blocks[i].parentElement;
@@ -465,8 +467,22 @@ async function renderMermaid(){
       const {svg}=await mermaid.render('mermaid-'+Date.now()+'-'+i,code);
       const wrap=document.createElement('div');
       wrap.className='mermaid-wrap';
+      wrap.dataset.mermaidSrc=code;
       wrap.innerHTML=svg;
       pre.replaceWith(wrap);
+    }catch(e){console.warn('Mermaid:',e)}
+  }
+}
+
+async function reRenderMermaid(){
+  const wraps=document.querySelectorAll('.mermaid-wrap[data-mermaid-src]');
+  if(!wraps.length)return;
+  mermaid.initialize({startOnLoad:false,theme:getMermaidTheme(),securityLevel:'loose'});
+  for(let i=0;i<wraps.length;i++){
+    const code=wraps[i].dataset.mermaidSrc;
+    try{
+      const {svg}=await mermaid.render('mermaid-'+Date.now()+'-'+i,code);
+      wraps[i].innerHTML=svg;
     }catch(e){console.warn('Mermaid:',e)}
   }
 }
@@ -529,6 +545,7 @@ function toggleTheme(){
   document.documentElement.setAttribute('data-theme',next);
   localStorage.setItem('theme',next);
   document.getElementById('themeBtn').innerHTML=next==='dark'?'&#9788;':'&#9790;';
+  reRenderMermaid();
 }
 (function(){
   const saved=localStorage.getItem('theme');
