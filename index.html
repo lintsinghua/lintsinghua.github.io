@@ -115,11 +115,11 @@ body{
   display:flex;flex-direction:column;
 }
 .content-wrapper{
-  max-width:820px;margin:0 auto;padding:48px 40px 120px;width:100%;
+  padding:48px 260px 120px 40px;width:100%;
 }
 
 /* ─── Landing ─── */
-.landing{text-align:center;padding:80px 40px 60px}
+.landing{text-align:center;padding:80px 0 60px}
 .landing-badge{
   display:inline-block;font-size:.7rem;font-weight:500;
   padding:4px 14px;border-radius:20px;
@@ -230,8 +230,7 @@ body{
 
 /* ─── TOC ─── */
 .toc{
-  position:sticky;top:24px;float:right;width:200px;
-  margin-left:40px;margin-right:-240px;
+  position:fixed;top:24px;right:32px;width:200px;
   max-height:calc(100vh - 48px);overflow-y:auto;
   font-size:.78rem;color:var(--text-muted);scrollbar-width:none;
 }
@@ -271,16 +270,16 @@ body{
 }
 .overlay.visible{display:block;opacity:1}
 
-@media(max-width:900px){
+@media(max-width:1200px){
   .toc{display:none}
-  .content-wrapper{padding:24px 20px 80px}
+  .content-wrapper{padding:48px 40px 120px}
 }
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
   .main{margin-left:0}
   .mobile-header{display:flex}
-  .content-wrapper{padding-top:72px}
+  .content-wrapper{padding-top:72px;padding-right:20px;padding-left:20px}
   .landing h1{font-size:1.8rem}
   .chapter-grid{grid-template-columns:1fr}
 }
