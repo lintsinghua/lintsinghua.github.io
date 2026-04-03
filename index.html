@@ -542,11 +542,17 @@ async function loadChapter(id){
 async function renderMermaid(){
   const blocks=document.querySelectorAll('.markdown-body pre code.language-mermaid');
   if(!blocks.length)return;
-  mermaid.initialize({startOnLoad:false,theme:getMermaidTheme(),securityLevel:'loose'});
+  mermaid.initialize({startOnLoad:false,theme:getMermaidTheme(),securityLevel:'loose',gantt:{useWidth:1200}});
+  // Create off-screen wide container for rendering so charts are not compressed
+  const offscreen=document.createElement('div');
+  offscreen.style.cssText='position:absolute;left:-9999px;top:0;width:1200px;';
+  document.body.appendChild(offscreen);
   for(let i=0;i<blocks.length;i++){
     const code=blocks[i].textContent;
     const pre=blocks[i].parentElement;
     try{
+      const tempEl=document.createElement('div');
+      offscreen.appendChild(tempEl);
       const {svg}=await mermaid.render('mermaid-'+Date.now()+'-'+i,code);
       const wrap=document.createElement('div');
       wrap.className='mermaid-wrap';
@@ -555,12 +561,13 @@ async function renderMermaid(){
       pre.replaceWith(wrap);
     }catch(e){console.warn('Mermaid:',e)}
   }
+  offscreen.remove();
 }
 
 async function reRenderMermaid(){
   const wraps=document.querySelectorAll('.mermaid-wrap[data-mermaid-src]');
   if(!wraps.length)return;
-  mermaid.initialize({startOnLoad:false,theme:getMermaidTheme(),securityLevel:'loose'});
+  mermaid.initialize({startOnLoad:false,theme:getMermaidTheme(),securityLevel:'loose',gantt:{useWidth:1200}});
   for(let i=0;i<wraps.length;i++){
     const code=wraps[i].dataset.mermaidSrc;
     try{
