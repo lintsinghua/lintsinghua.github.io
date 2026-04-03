@@ -497,7 +497,7 @@ async function loadChapter(id){
   if(cache[cacheKey]){md=cache[cacheKey]}
   else{
     try{
-      const resp=await fetch(BASE()+encodeURIComponent(ch.file));
+      const resp=await fetch(BASE()+ch.file.split('/').map(encodeURIComponent).join('/'));
       if(!resp.ok)throw new Error(resp.status);
       md=await resp.text();cache[cacheKey]=md;
     }catch(e){
