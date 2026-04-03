@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>解码 Agent Harness — Claude Code 架构深度剖析</title>
+<title>御舆 — 解码 Agent Harness · Claude Code 架构深度剖析</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
@@ -130,6 +130,15 @@ body{
 
 /* ─── Landing ─── */
 .landing{text-align:center;padding:80px 0 60px}
+.landing-cover{
+  max-width:520px;width:100%;margin:0 auto 36px;border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);overflow:hidden;
+  transition:transform .3s ease,box-shadow .3s ease;
+}
+.landing-cover:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.landing-cover img{width:100%;display:block}
+[data-theme="dark"] .landing-cover{box-shadow:0 8px 32px rgba(0,0,0,.4)}
+[data-theme="dark"] .landing-cover:hover{box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .landing-badge{
   display:inline-block;font-size:.7rem;font-weight:500;
   padding:4px 14px;border-radius:20px;
@@ -324,13 +333,13 @@ body{
 
 <header class="mobile-header">
   <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
-  <span class="title" id="mobileTitle">解码 Agent Harness</span>
+  <span class="title" id="mobileTitle">御舆</span>
 </header>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h1 id="sidebarTitle">解码 Agent Harness</h1>
-    <p id="sidebarSubtitle">Claude Code 架构深度剖析</p>
+    <h1 id="sidebarTitle">御舆</h1>
+    <p id="sidebarSubtitle">解码 Agent Harness · Claude Code 架构深度剖析</p>
   </div>
   <nav class="sidebar-nav" id="nav"></nav>
   <div class="sidebar-footer">
@@ -358,12 +367,12 @@ const BASE_EN='https://raw.githubusercontent.com/lintsinghua/claude-code-book/ma
 /* ─── i18n data ─── */
 const I18N={
   zh:{
-    siteTitle:'解码 Agent Harness',
-    siteSubtitle:'Claude Code 架构深度剖析',
+    siteTitle:'御舆',
+    siteSubtitle:'解码 Agent Harness · Claude Code 架构深度剖析',
     landingBadge:'开源免费 · CC BY-NC-SA 4.0',
-    landingTitle:'解码 <em>Agent Harness</em>',
+    landingTitle:'御舆：解码 <em>Agent Harness</em>',
     landingSubtitle:'Claude Code 架构深度剖析',
-    landingDesc:'不做使用教程，不列 Prompt 技巧——拆解 Agent 的骨架与神经。<br>读懂 Claude Code 的设计决策，你就拥有了一套可迁移到任何 Agent 框架的心智模型。',
+    landingDesc:'<em>"一器而工聚焉者，车为多。"</em>——《考工记》<br>古人御舆，驾驭天地间最精密的机械；今人御舆，驾驭硅基时代最复杂的智能体系统。<br>不做使用教程，不列 Prompt 技巧——拆解 Agent 的骨架与神经。',
     tocTitle:'目录',
     loading:'加载中…',
     loadError:'加载失败',
@@ -371,12 +380,12 @@ const I18N={
     langLabel:'EN',
   },
   en:{
-    siteTitle:'Decoding Agent Harness',
-    siteSubtitle:'A Deep Architectural Analysis of Claude Code',
+    siteTitle:'Yù Yú',
+    siteSubtitle:'Decoding Agent Harness · Claude Code Architecture',
     landingBadge:'Open Source · CC BY-NC-SA 4.0',
-    landingTitle:'Decoding <em>Agent Harness</em>',
+    landingTitle:'Yù Yú: Decoding <em>Agent Harness</em>',
     landingSubtitle:'A Deep Architectural Analysis of Claude Code',
-    landingDesc:'Not a usage tutorial. Not a list of prompt tricks — dissecting the skeleton and nerves of an Agent.<br>Understand Claude Code\'s design decisions and gain a mental model transferable to any Agent framework.',
+    landingDesc:'<em>"Of all instruments, the chariot demands the most hands to build."</em> — Kǎo Gōng Jì (c. 300 BC)<br>Not a usage tutorial. Not a list of prompt tricks — dissecting the skeleton and nerves of an Agent.',
     tocTitle:'On this page',
     loading:'Loading…',
     loadError:'Failed to load',
@@ -596,6 +605,7 @@ function showLanding(){
   });
   content.innerHTML=`
     <div class="landing">
+      <div class="landing-cover"><img src="cover.png" alt="御舆 — 解码 Agent Harness"></div>
       <div class="landing-badge">${t('landingBadge')}</div>
       <h1>${t('landingTitle')}</h1>
       <div class="subtitle">${t('landingSubtitle')}</div>
