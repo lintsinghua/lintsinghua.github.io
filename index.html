@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>解码 Agent Harness — Claude Code 架构深度剖析</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -97,12 +97,13 @@ body{
   padding:14px 24px;border-top:1px solid var(--border);
   display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;
 }
-.theme-toggle{
+.theme-toggle,.lang-toggle{
   width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
   background:var(--bg-card);cursor:pointer;display:flex;align-items:center;justify-content:center;
   font-size:1rem;transition:all var(--transition);color:var(--text-secondary);
 }
-.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.lang-toggle{font-size:.72rem;font-weight:600;font-family:var(--font-mono)}
+.theme-toggle:hover,.lang-toggle:hover{border-color:var(--accent);color:var(--accent)}
 .gh-link{
   display:inline-flex;align-items:center;gap:6px;
   font-size:.78rem;font-weight:500;color:var(--text-secondary);
@@ -323,17 +324,18 @@ body{
 
 <header class="mobile-header">
   <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
-  <span class="title">解码 Agent Harness</span>
+  <span class="title" id="mobileTitle">解码 Agent Harness</span>
 </header>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h1>解码 Agent Harness</h1>
-    <p>Claude Code 架构深度剖析</p>
+    <h1 id="sidebarTitle">解码 Agent Harness</h1>
+    <p id="sidebarSubtitle">Claude Code 架构深度剖析</p>
   </div>
   <nav class="sidebar-nav" id="nav"></nav>
   <div class="sidebar-footer">
     <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">&#9790;</button>
+    <button class="lang-toggle" onclick="toggleLang()" id="langBtn" aria-label="Switch language">EN</button>
     <a class="gh-link" href="https://github.com/lintsinghua/claude-code-book" target="_blank">
       <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
       GitHub
@@ -350,9 +352,40 @@ body{
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
-const BASE='https://raw.githubusercontent.com/lintsinghua/claude-code-book/main/';
+const BASE_ZH='https://raw.githubusercontent.com/lintsinghua/claude-code-book/main/';
+const BASE_EN='https://raw.githubusercontent.com/lintsinghua/claude-code-book/main/en/';
 
-const CHAPTERS=[
+/* ─── i18n data ─── */
+const I18N={
+  zh:{
+    siteTitle:'解码 Agent Harness',
+    siteSubtitle:'Claude Code 架构深度剖析',
+    landingBadge:'开源免费 · CC BY-NC-SA 4.0',
+    landingTitle:'解码 <em>Agent Harness</em>',
+    landingSubtitle:'Claude Code 架构深度剖析',
+    landingDesc:'不做使用教程，不列 Prompt 技巧——拆解 Agent 的骨架与神经。<br>读懂 Claude Code 的设计决策，你就拥有了一套可迁移到任何 Agent 框架的心智模型。',
+    tocTitle:'目录',
+    loading:'加载中…',
+    loadError:'加载失败',
+    loadErrorHint:'请检查网络连接后刷新重试',
+    langLabel:'EN',
+  },
+  en:{
+    siteTitle:'Decoding Agent Harness',
+    siteSubtitle:'A Deep Architectural Analysis of Claude Code',
+    landingBadge:'Open Source · CC BY-NC-SA 4.0',
+    landingTitle:'Decoding <em>Agent Harness</em>',
+    landingSubtitle:'A Deep Architectural Analysis of Claude Code',
+    landingDesc:'Not a usage tutorial. Not a list of prompt tricks — dissecting the skeleton and nerves of an Agent.<br>Understand Claude Code\'s design decisions and gain a mental model transferable to any Agent framework.',
+    tocTitle:'On this page',
+    loading:'Loading…',
+    loadError:'Failed to load',
+    loadErrorHint:'Please check your network connection and try again',
+    langLabel:'中',
+  }
+};
+
+const CHAPTERS_ZH=[
   {id:'preface',title:'前言',file:'00-前言.md',part:''},
   {id:'ch01',num:'01',title:'智能体编程的新范式',file:'第一部分-基础篇/01-智能体编程的新范式.md',part:'第一部分 · 基础篇',desc:'从聊天到工具调用，范式如何转移'},
   {id:'ch02',num:'02',title:'对话循环 — Agent 的心跳',file:'第一部分-基础篇/02-对话循环-Agent的心跳.md',part:'第一部分 · 基础篇',desc:'异步生成器驱动的永动主循环'},
@@ -375,13 +408,43 @@ const CHAPTERS=[
   {id:'appd',num:'D',title:'术语表',file:'附录/D-术语表.md',part:'附录',desc:'100 条中英对照'},
 ];
 
-const cache={};
-let currentChapter=null;
+const CHAPTERS_EN=[
+  {id:'preface',title:'Foreword',file:'00-Foreword.md',part:''},
+  {id:'ch01',num:'01',title:'The New Paradigm of Agent Programming',file:'Part-1-Foundations/01-The-New-Paradigm-of-Agent-Programming.md',part:'Part 1 · Foundations',desc:'From chat to tool calls — how the paradigm shifts'},
+  {id:'ch02',num:'02',title:'The Dialog Loop — Agent\'s Heartbeat',file:'Part-1-Foundations/02-The-Dialog-Loop-Heartbeat-of-an-Agent.md',part:'Part 1 · Foundations',desc:'Async generator-driven perpetual main loop'},
+  {id:'ch03',num:'03',title:'The Tool System — Agent\'s Hands',file:'Part-1-Foundations/03-The-Tool-System-Agent-Hands.md',part:'Part 1 · Foundations',desc:'45+ tools: registration, filtering & concurrent dispatch'},
+  {id:'ch04',num:'04',title:'The Permission Pipeline — Agent\'s Guardrails',file:'Part-1-Foundations/04-The-Permission-Pipeline-Agent-Guardrails.md',part:'Part 1 · Foundations',desc:'Four-stage security pipeline & permission modes'},
+  {id:'ch05',num:'05',title:'Settings & Configuration — Agent\'s DNA',file:'Part-2-Core-Systems/05-Settings-and-Configuration-Agent-DNA.md',part:'Part 2 · Core Systems',desc:'Six-layer config priority & supply chain defense'},
+  {id:'ch06',num:'06',title:'The Memory System — Agent\'s Long-Term Memory',file:'Part-2-Core-Systems/06-The-Memory-System-Agent-Long-Term-Memory.md',part:'Part 2 · Core Systems',desc:'Persistence, indexing & cross-session retention'},
+  {id:'ch07',num:'07',title:'Context Management — Agent\'s Working Memory',file:'Part-2-Core-Systems/07-Context-Management-Agent-Working-Memory.md',part:'Part 2 · Core Systems',desc:'Four-level progressive compression & token budgets'},
+  {id:'ch08',num:'08',title:'The Hook System — Lifecycle Extension Points',file:'Part-2-Core-Systems/08-The-Hook-System-Agent-Lifecycle-Extension-Points.md',part:'Part 2 · Core Systems',desc:'26 lifecycle events & security boundaries'},
+  {id:'ch09',num:'09',title:'Sub-Agents & the Fork Pattern',file:'Part-3-Advanced-Patterns/09-Sub-Agents-and-the-Fork-Pattern.md',part:'Part 3 · Advanced Patterns',desc:'Byte-level context inheritance & parallel subtasks'},
+  {id:'ch10',num:'10',title:'The Coordinator Pattern — Multi-Agent Orchestration',file:'Part-3-Advanced-Patterns/10-The-Coordinator-Pattern-Multi-Agent-Orchestration.md',part:'Part 3 · Advanced Patterns',desc:'Coordinator-Worker architecture'},
+  {id:'ch11',num:'11',title:'The Skill System & Plugin Architecture',file:'Part-3-Advanced-Patterns/11-The-Skill-System-and-Plugin-Architecture.md',part:'Part 3 · Advanced Patterns',desc:'Zero-config skill protocol'},
+  {id:'ch12',num:'12',title:'MCP Integration & External Protocols',file:'Part-3-Advanced-Patterns/12-MCP-Integration-and-External-Protocols.md',part:'Part 3 · Advanced Patterns',desc:'Model Context Protocol & protocol bridging'},
+  {id:'ch13',num:'13',title:'Streaming Architecture & Performance',file:'Part-4-Engineering-Practice/13-Streaming-Architecture-and-Performance-Optimization.md',part:'Part 4 · Engineering Practice',desc:'Parallel prefetch, lazy loading, cache sharing'},
+  {id:'ch14',num:'14',title:'Plan Mode & Structured Workflows',file:'Part-4-Engineering-Practice/14-Plan-Mode-and-Structured-Workflows.md',part:'Part 4 · Engineering Practice',desc:'Separating planning from execution'},
+  {id:'ch15',num:'15',title:'Building Your Own Agent Harness',file:'Part-4-Engineering-Practice/15-Building-Your-Own-Agent-Harness.md',part:'Part 4 · Engineering Practice',desc:'Six steps from scratch'},
+  {id:'appa',num:'A',title:'Architecture Navigation Map',file:'Appendices/A-Architecture-Navigation-Map.md',part:'Appendix',desc:'Module dependencies & data flow'},
+  {id:'appb',num:'B',title:'Complete Tool Inventory',file:'Appendices/B-Complete-Tool-Inventory.md',part:'Appendix',desc:'50+ tools quick reference'},
+  {id:'appc',num:'C',title:'Feature Flag Reference',file:'Appendices/C-Feature-Flag-Reference.md',part:'Appendix',desc:'89 Feature Flags'},
+  {id:'appd',num:'D',title:'Glossary',file:'Appendices/D-Glossary.md',part:'Appendix',desc:'100 bilingual terms'},
+];
 
+/* ─── State ─── */
+let lang=localStorage.getItem('lang')||'zh';
+let currentChapter=null;
+const cache={};
+
+function CHAPTERS(){return lang==='en'?CHAPTERS_EN:CHAPTERS_ZH}
+function BASE(){return lang==='en'?BASE_EN:BASE_ZH}
+function t(key){return I18N[lang][key]||key}
+
+/* ─── Markdown / Mermaid ─── */
 marked.setOptions({
-  highlight:(code,lang)=>{
-    if(lang==='mermaid')return code;
-    if(lang&&hljs.getLanguage(lang))return hljs.highlight(code,{language:lang}).value;
+  highlight:(code,l)=>{
+    if(l==='mermaid')return code;
+    if(l&&hljs.getLanguage(l))return hljs.highlight(code,{language:l}).value;
     return hljs.highlightAuto(code).value;
   },
   breaks:false,gfm:true,
@@ -389,10 +452,12 @@ marked.setOptions({
 mermaid.initialize({startOnLoad:false,theme:'default',securityLevel:'loose'});
 function getMermaidTheme(){return document.documentElement.getAttribute('data-theme')==='dark'?'dark':'default'}
 
+/* ─── Nav ─── */
 function buildNav(){
   const nav=document.getElementById('nav');
+  const chapters=CHAPTERS();
   let lastPart='',html='';
-  CHAPTERS.forEach(ch=>{
+  chapters.forEach(ch=>{
     if(ch.part&&ch.part!==lastPart){
       if(lastPart)html+='</div>';
       html+=`<div class="nav-section"><div class="nav-section-title">${ch.part}</div>`;
@@ -406,10 +471,17 @@ function buildNav(){
   });
   if(lastPart)html+='</div>';
   nav.innerHTML=html;
+  // restore active state
+  if(currentChapter){
+    const activeNav=document.querySelector(`.nav-item[data-id="${currentChapter}"]`);
+    if(activeNav)activeNav.classList.add('active');
+  }
 }
 
+/* ─── Load chapter ─── */
 async function loadChapter(id){
-  const ch=CHAPTERS.find(c=>c.id===id);
+  const chapters=CHAPTERS();
+  const ch=chapters.find(c=>c.id===id);
   if(!ch)return;
   history.pushState(null,'','#'+id);
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
@@ -418,27 +490,28 @@ async function loadChapter(id){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').classList.remove('visible');
   const content=document.getElementById('content');
-  content.innerHTML='<div class="loading"><div class="spinner"></div><span>加载中…</span></div>';
+  content.innerHTML=`<div class="loading"><div class="spinner"></div><span>${t('loading')}</span></div>`;
   window.scrollTo({top:0});
+  const cacheKey=lang+'_'+id;
   let md;
-  if(cache[id]){md=cache[id]}
+  if(cache[cacheKey]){md=cache[cacheKey]}
   else{
     try{
-      const resp=await fetch(BASE+encodeURIComponent(ch.file));
+      const resp=await fetch(BASE()+encodeURIComponent(ch.file));
       if(!resp.ok)throw new Error(resp.status);
-      md=await resp.text();cache[id]=md;
+      md=await resp.text();cache[cacheKey]=md;
     }catch(e){
-      content.innerHTML=`<div class="loading"><p>加载失败 (${e.message})</p><p style="font-size:.82rem;margin-top:8px">请检查网络连接后刷新重试</p></div>`;
+      content.innerHTML=`<div class="loading"><p>${t('loadError')} (${e.message})</p><p style="font-size:.82rem;margin-top:8px">${t('loadErrorHint')}</p></div>`;
       return;
     }
   }
   currentChapter=id;
   const html=marked.parse(md);
-  const idx=CHAPTERS.findIndex(c=>c.id===id);
-  const prev=idx>0?CHAPTERS[idx-1]:null;
-  const next=idx<CHAPTERS.length-1?CHAPTERS[idx+1]:null;
+  const idx=chapters.findIndex(c=>c.id===id);
+  const prev=idx>0?chapters[idx-1]:null;
+  const next=idx<chapters.length-1?chapters[idx+1]:null;
   const partLabel=ch.part?`<div class="part-label">${ch.part}</div>`:'';
-  const tocHtml='<div class="toc" id="toc"><div class="toc-title">目录</div></div>';
+  const tocHtml=`<div class="toc" id="toc"><div class="toc-title">${t('tocTitle')}</div></div>`;
   content.innerHTML=`
     ${tocHtml}
     <article class="article visible">
@@ -450,12 +523,13 @@ async function loadChapter(id){
       </div>
     </article>
   `;
-  document.title=`${ch.title} — 解码 Agent Harness`;
+  document.title=`${ch.title} — ${t('siteTitle')}`;
   buildTOC();
   updateProgress();
   renderMermaid();
 }
 
+/* ─── Mermaid ─── */
 async function renderMermaid(){
   const blocks=document.querySelectorAll('.markdown-body pre code.language-mermaid');
   if(!blocks.length)return;
@@ -487,12 +561,13 @@ async function reRenderMermaid(){
   }
 }
 
+/* ─── TOC ─── */
 function buildTOC(){
   const toc=document.getElementById('toc');
   if(!toc)return;
   const headings=document.querySelectorAll('.markdown-body h2,.markdown-body h3');
   if(headings.length===0){toc.style.display='none';return}
-  let html='<div class="toc-title">目录</div>';
+  let html=`<div class="toc-title">${t('tocTitle')}</div>`;
   headings.forEach((h,i)=>{
     const hid='heading-'+i;h.id=hid;
     const indent=h.tagName==='H3'?'padding-left:12px;font-size:.72rem;':'';
@@ -503,12 +578,15 @@ function buildTOC(){
 
 function smoothScroll(e,id){e.preventDefault();document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
 
+/* ─── Landing ─── */
 function showLanding(){
   history.pushState(null,'',window.location.pathname);
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  currentChapter=null;
   const content=document.getElementById('content');
+  const chapters=CHAPTERS();
   let cardsHtml='';
-  CHAPTERS.filter(c=>c.num).forEach(ch=>{
+  chapters.filter(c=>c.num).forEach(ch=>{
     cardsHtml+=`
       <div class="chapter-card" onclick="loadChapter('${ch.id}')">
         <div class="num">${ch.num}</div>
@@ -518,19 +596,17 @@ function showLanding(){
   });
   content.innerHTML=`
     <div class="landing">
-      <div class="landing-badge">开源免费 · CC BY-NC-SA 4.0</div>
-      <h1>解码 <em>Agent Harness</em></h1>
-      <div class="subtitle">Claude Code 架构深度剖析</div>
-      <p class="landing-desc">
-        不做使用教程，不列 Prompt 技巧——拆解 Agent 的骨架与神经。<br>
-        读懂 Claude Code 的设计决策，你就拥有了一套可迁移到任何 Agent 框架的心智模型。
-      </p>
+      <div class="landing-badge">${t('landingBadge')}</div>
+      <h1>${t('landingTitle')}</h1>
+      <div class="subtitle">${t('landingSubtitle')}</div>
+      <p class="landing-desc">${t('landingDesc')}</p>
       <div class="chapter-grid">${cardsHtml}</div>
     </div>
   `;
-  document.title='解码 Agent Harness — Claude Code 架构深度剖析';
+  document.title=`${t('siteTitle')} — ${t('siteSubtitle')}`;
 }
 
+/* ─── Progress ─── */
 function updateProgress(){
   const el=document.getElementById('progress');
   const scrolled=window.scrollY;
@@ -539,6 +615,7 @@ function updateProgress(){
 }
 window.addEventListener('scroll',updateProgress,{passive:true});
 
+/* ─── Theme ─── */
 function toggleTheme(){
   const current=document.documentElement.getAttribute('data-theme');
   const next=current==='dark'?'':'dark';
@@ -547,7 +624,39 @@ function toggleTheme(){
   document.getElementById('themeBtn').innerHTML=next==='dark'?'&#9788;':'&#9790;';
   reRenderMermaid();
 }
+
+/* ─── Language ─── */
+function applyLangUI(){
+  document.getElementById('sidebarTitle').textContent=t('siteTitle');
+  document.getElementById('sidebarSubtitle').textContent=t('siteSubtitle');
+  document.getElementById('mobileTitle').textContent=t('siteTitle');
+  document.getElementById('langBtn').textContent=t('langLabel');
+  document.documentElement.lang=lang==='en'?'en':'zh-CN';
+  if(lang==='en'){
+    document.documentElement.style.setProperty('--font-sans','Inter,system-ui,sans-serif');
+    document.documentElement.style.setProperty('--font-serif','Georgia,serif');
+  }else{
+    document.documentElement.style.setProperty('--font-sans','Noto Sans SC,system-ui,sans-serif');
+    document.documentElement.style.setProperty('--font-serif','Noto Serif SC,serif');
+  }
+}
+
+function toggleLang(){
+  lang=lang==='zh'?'en':'zh';
+  localStorage.setItem('lang',lang);
+  applyLangUI();
+  buildNav();
+  // reload current view
+  if(currentChapter){
+    loadChapter(currentChapter);
+  }else{
+    showLanding();
+  }
+}
+
+/* ─── Init ─── */
 (function(){
+  // theme
   const saved=localStorage.getItem('theme');
   if(saved){
     document.documentElement.setAttribute('data-theme',saved);
@@ -556,6 +665,10 @@ function toggleTheme(){
     document.documentElement.setAttribute('data-theme','dark');
     document.getElementById('themeBtn').innerHTML='&#9788;';
   }
+  // lang
+  const savedLang=localStorage.getItem('lang');
+  if(savedLang)lang=savedLang;
+  applyLangUI();
 })();
 
 function toggleSidebar(){
@@ -566,19 +679,20 @@ document.getElementById('overlay').addEventListener('click',toggleSidebar);
 
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
-  const idx=CHAPTERS.findIndex(c=>c.id===currentChapter);
-  if(e.key==='ArrowLeft'&&idx>0)loadChapter(CHAPTERS[idx-1].id);
-  if(e.key==='ArrowRight'&&idx<CHAPTERS.length-1)loadChapter(CHAPTERS[idx+1].id);
+  const chapters=CHAPTERS();
+  const idx=chapters.findIndex(c=>c.id===currentChapter);
+  if(e.key==='ArrowLeft'&&idx>0)loadChapter(chapters[idx-1].id);
+  if(e.key==='ArrowRight'&&idx<chapters.length-1)loadChapter(chapters[idx+1].id);
 });
 
 window.addEventListener('hashchange',()=>{
   const hash=location.hash.slice(1);
-  if(hash&&CHAPTERS.find(c=>c.id===hash))loadChapter(hash);
+  if(hash&&CHAPTERS().find(c=>c.id===hash))loadChapter(hash);
 });
 
 buildNav();
 const hash=location.hash.slice(1);
-if(hash&&CHAPTERS.find(c=>c.id===hash))loadChapter(hash);
+if(hash&&CHAPTERS().find(c=>c.id===hash))loadChapter(hash);
 else showLanding();
 </script>
 </body>
