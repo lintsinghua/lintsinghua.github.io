@@ -515,7 +515,13 @@ async function loadChapter(id){
     }
   }
   currentChapter=id;
-  const html=marked.parse(md);
+  const baseUrl=BASE();
+  const chapterDir=ch.file.includes('/')?ch.file.substring(0,ch.file.lastIndexOf('/')+1):'';
+  const html=marked.parse(md).replace(/<img src="((?!https?:\/\/)[^"]+)"/g,(m,src)=>{
+    const parts=(chapterDir+src).split('/');const r=[];
+    for(const p of parts){if(p==='..')r.pop();else if(p!=='.'&&p!=='')r.push(p);}
+    return `<img src="${baseUrl+r.join('/')}"`;
+  });
   const idx=chapters.findIndex(c=>c.id===id);
   const prev=idx>0?chapters[idx-1]:null;
   const next=idx<chapters.length-1?chapters[idx+1]:null;
