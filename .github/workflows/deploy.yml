@@ -1,0 +1,81 @@
+name: Deploy book reader
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '3 */5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      changed: ${{ steps.version.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: site
+      - uses: actions/checkout@v4
+        with:
+          repository: lintsinghua/claude-code-book
+          ref: main
+          path: book
+          persist-credentials: false
+      - name: Detect content or reader updates
+        id: version
+        run: >-
+          python3 site/scripts/check_release.py
+          --book book --url https://lintsinghua.github.io
+          --output "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: steps.version.outputs.changed == 'true'
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: book/package-lock.json
+      - name: Validate book and diagrams
+        if: steps.version.outputs.changed == 'true'
+        working-directory: book
+        run: |
+          npm ci
+          python3 scripts/check_book.py
+          npm run check:diagrams
+          python3 -m unittest discover -s tests
+      - name: Test release builder
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          python3 -m unittest discover -s site/tests
+          node --test site/tests/test_reader.mjs
+      - name: Build versioned content
+        if: steps.version.outputs.changed == 'true'
+        run: python3 site/scripts/build_site.py --book book --output _site
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.version.outputs.changed == 'true' && github.event_name != 'pull_request'
+        with:
+          path: _site
+
+  deploy:
+    if: needs.build.outputs.changed == 'true' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - uses: actions/deploy-pages@v4
+        id: deployment

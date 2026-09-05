@@ -362,8 +362,9 @@ body{
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js"></script>
 <script>
-const BASE_ZH='https://raw.githubusercontent.com/lintsinghua/claude-code-book/main/';
-const BASE_EN='https://raw.githubusercontent.com/lintsinghua/claude-code-book/main/en/';
+const BASE_ZH='__BOOK_BASE__';
+const BASE_EN=BASE_ZH+'en/';
+const SITE_RELEASE='__SITE_RELEASE__';
 
 /* ─── i18n data ─── */
 const I18N={
@@ -445,12 +446,37 @@ const CHAPTERS_EN=[
 let lang=localStorage.getItem('lang')||'zh';
 let currentChapter=null;
 const cache={};
-const CONTENT_CACHE_TTL=60_000;
-function contentVersion(){return Math.floor(Date.now()/CONTENT_CACHE_TTL)}
+
 
 function CHAPTERS(){return lang==='en'?CHAPTERS_EN:CHAPTERS_ZH}
 function BASE(){return lang==='en'?BASE_EN:BASE_ZH}
 function t(key){return I18N[lang][key]||key}
+
+/* ─── Release updates ─── */
+let updateCheckInFlight=false;
+async function refreshIfUpdated(){
+  if(document.hidden||updateCheckInFlight)return false;
+  updateCheckInFlight=true;
+  try{
+    const response=await fetch('./version.json?t='+Date.now(),{cache:'no-store'});
+    if(!response.ok)return false;
+    const next=await response.json();
+    if(!/^[a-f0-9]{64}$/.test(next.release)||next.release===SITE_RELEASE)return false;
+    // Avoid reload loops if an intermediate CDN still serves an older document.
+    if(sessionStorage.getItem('reader-reloaded-release')===next.release)return false;
+    sessionStorage.setItem('reader-reloaded-release',next.release);
+    const url=new URL(location.href);
+    url.searchParams.set('v',next.release);
+    if(currentChapter)url.hash=currentChapter;
+    location.replace(url.href);
+    return true;
+  }catch(error){
+    // An offline reader keeps its current release and retries on the next check.
+    return false;
+  }finally{
+    updateCheckInFlight=false;
+  }
+}
 
 /* ─── Markdown / Mermaid ─── */
 marked.setOptions({
@@ -506,14 +532,15 @@ async function loadChapter(id){
   window.scrollTo({top:0});
   const cacheKey=lang+'_'+id;
   let md;
-  if(cache[cacheKey]&&cache[cacheKey].expiresAt>Date.now()){md=cache[cacheKey].md}
+  if(cache[cacheKey]){md=cache[cacheKey]}
   else{
     try{
-      const url=BASE()+ch.file.split('/').map(encodeURIComponent).join('/')+'?v='+contentVersion();
-      const resp=await fetch(url,{cache:'no-store'});
+      const url=BASE()+ch.file.split('/').map(encodeURIComponent).join('/');
+      const resp=await fetch(url);
       if(!resp.ok)throw new Error(resp.status);
-      md=await resp.text();cache[cacheKey]={md,expiresAt:Date.now()+CONTENT_CACHE_TTL};
+      md=await resp.text();cache[cacheKey]=md;
     }catch(e){
+      if(await refreshIfUpdated())return;
       content.innerHTML=`<div class="loading"><p>${t('loadError')} (${e.message})</p><p style="font-size:.82rem;margin-top:8px">${t('loadErrorHint')}</p></div>`;
       return;
     }
@@ -625,7 +652,7 @@ function showLanding(){
       <h1>${t('landingTitle')}</h1>
       <div class="subtitle">${t('landingSubtitle')}</div>
       <p class="landing-desc">${t('landingDesc')}</p>
-      <div class="landing-cover"><img src="${BASE_ZH}cover.png?v=${contentVersion()}" alt="御舆：解码 Agent Harness — Claude Code 架构深度剖析"></div>
+      <div class="landing-cover"><img src="${BASE_ZH}cover.png" alt="御舆：解码 Agent Harness — Claude Code 架构深度剖析"></div>
       <div class="chapter-grid">${cardsHtml}</div>
     </div>
   `;
@@ -720,6 +747,9 @@ buildNav();
 const hash=location.hash.slice(1);
 if(hash&&CHAPTERS().find(c=>c.id===hash))loadChapter(hash);
 else showLanding();
+refreshIfUpdated();
+setInterval(refreshIfUpdated,60_000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshIfUpdated()});
 </script>
 </body>
 </html>
