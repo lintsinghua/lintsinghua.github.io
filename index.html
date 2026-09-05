@@ -360,7 +360,7 @@ body{
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js"></script>
 <script>
 const BASE_ZH='https://raw.githubusercontent.com/lintsinghua/claude-code-book/main/';
 const BASE_EN='https://raw.githubusercontent.com/lintsinghua/claude-code-book/main/en/';
@@ -373,7 +373,7 @@ const I18N={
     landingBadge:'开源免费 · CC BY-NC-SA 4.0',
     landingTitle:'御舆：解码 <em>Agent Harness</em>',
     landingSubtitle:'Claude Code 架构深度剖析',
-    landingDesc:'<em>"一器而工聚焉者，车为多。"</em>——《考工记》<br>古人御舆，驾驭天地间最精密的机械；今人御舆，驾驭硅基时代最复杂的智能体系统。<br>不做使用教程，不列 Prompt 技巧——拆解 Agent 的骨架与神经。',
+    landingDesc:'<em>"一器而工聚焉者，车为多。"</em>——《考工记》<br>古人造车，合众工之巧；今人构建智能体，亦需理解各部分如何协作。<br>所谓“御舆”，既是驾驭，也是知其构造、明其机理。<br>15 章、4 篇附录，从对话循环、工具与权限，到记忆、上下文管理和多智能体编排。',
     tocTitle:'目录',
     loading:'加载中…',
     loadError:'加载失败',
@@ -386,7 +386,7 @@ const I18N={
     landingBadge:'Open Source · CC BY-NC-SA 4.0',
     landingTitle:'Yù Yú: Decoding <em>Agent Harness</em>',
     landingSubtitle:'A Deep Architectural Analysis of Claude Code',
-    landingDesc:'<em>"Of all instruments, the chariot demands the most hands to build."</em> — Kǎo Gōng Jì (c. 300 BC)<br>Not a usage tutorial. Not a list of prompt tricks — dissecting the skeleton and nerves of an Agent.',
+    landingDesc:'<em>"Of all artifacts that bring many crafts together, the chariot calls upon the most."</em> — Kǎo Gōng Jì<br>Chariot builders brought many crafts into one working whole. Agent builders, too, must understand how the parts work together.<br>Fifteen chapters and four appendices explore conversation loops, tools, permissions, memory, context, and orchestration.',
     tocTitle:'On this page',
     loading:'Loading…',
     loadError:'Failed to load',
@@ -445,6 +445,8 @@ const CHAPTERS_EN=[
 let lang=localStorage.getItem('lang')||'zh';
 let currentChapter=null;
 const cache={};
+const CONTENT_CACHE_TTL=60_000;
+function contentVersion(){return Math.floor(Date.now()/CONTENT_CACHE_TTL)}
 
 function CHAPTERS(){return lang==='en'?CHAPTERS_EN:CHAPTERS_ZH}
 function BASE(){return lang==='en'?BASE_EN:BASE_ZH}
@@ -504,12 +506,13 @@ async function loadChapter(id){
   window.scrollTo({top:0});
   const cacheKey=lang+'_'+id;
   let md;
-  if(cache[cacheKey]){md=cache[cacheKey]}
+  if(cache[cacheKey]&&cache[cacheKey].expiresAt>Date.now()){md=cache[cacheKey].md}
   else{
     try{
-      const resp=await fetch(BASE()+ch.file.split('/').map(encodeURIComponent).join('/'));
+      const url=BASE()+ch.file.split('/').map(encodeURIComponent).join('/')+'?v='+contentVersion();
+      const resp=await fetch(url,{cache:'no-store'});
       if(!resp.ok)throw new Error(resp.status);
-      md=await resp.text();cache[cacheKey]=md;
+      md=await resp.text();cache[cacheKey]={md,expiresAt:Date.now()+CONTENT_CACHE_TTL};
     }catch(e){
       content.innerHTML=`<div class="loading"><p>${t('loadError')} (${e.message})</p><p style="font-size:.82rem;margin-top:8px">${t('loadErrorHint')}</p></div>`;
       return;
@@ -560,7 +563,7 @@ async function renderMermaid(){
     try{
       const tempEl=document.createElement('div');
       offscreen.appendChild(tempEl);
-      const {svg}=await mermaid.render('mermaid-'+Date.now()+'-'+i,code);
+      const {svg}=await mermaid.render('mermaid-'+Date.now()+'-'+i,code,tempEl);
       const wrap=document.createElement('div');
       wrap.className='mermaid-wrap';
       wrap.dataset.mermaidSrc=code;
@@ -622,7 +625,7 @@ function showLanding(){
       <h1>${t('landingTitle')}</h1>
       <div class="subtitle">${t('landingSubtitle')}</div>
       <p class="landing-desc">${t('landingDesc')}</p>
-      <div class="landing-cover"><img src="cover.png" alt="御舆 — 解码 Agent Harness"></div>
+      <div class="landing-cover"><img src="${BASE_ZH}cover.png?v=${contentVersion()}" alt="御舆：解码 Agent Harness — Claude Code 架构深度剖析"></div>
       <div class="chapter-grid">${cardsHtml}</div>
     </div>
   `;
